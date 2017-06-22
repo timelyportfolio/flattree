@@ -10,13 +10,13 @@ In the R package [`d3r`](https://github.com/timelyportfolio/d3r), I have a conve
 
 Below are some very simplified examples.
 
-**tree as array of arrays**
+### tree as array of arrays
 
 ```
 d3.flattree([["A",null],["A","A.1",20],["A","A.2",30]], [0,1])
 ```
 
-**tree as array of objects**
+### tree as array of objects
 
 ```
 d3.flattree(
@@ -29,3 +29,6 @@ d3.flattree(
 )
 ```
 
+### live use for treemap
+
+[bl.ocks](https://bl.ocks.org/timelyportfolio/24ee2544ba12c8b7dedf4a472fb784de)
