@@ -1,0 +1,33 @@
+{
+  "name": "flattree",
+  "version": "0.0.1",
+  "description": "Convert flat tree table to d3 hierarchy.",
+  "keywords": [
+    "d3",
+    "d3-module",
+    "treemap",
+    "hierarchy"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Kenton Russell",
+    "url": "https://github.com/timelyportfolo"
+  },
+  "main": "build/d3-flattree.js",
+  "module": "index",
+  "jsnext:main": "index",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/timelyportfolio/flattree.git"
+  },
+  "scripts": {
+    "pretest": "rm -rf build && mkdir build && rollup -g d3-hierarchy:d3,d3-collection:d3 -f umd -n d3 -o build/d3-flattree.js -- index.js"
+  },
+  "dependencies": {
+    "d3-collection": "^1.0.4",
+    "d3-hierarchy": "^1.1.5"
+  },
+  "devDependencies": {
+    "rollup": "0.42"
+  }
+}

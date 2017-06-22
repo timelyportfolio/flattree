@@ -1,0 +1,1 @@
+export {default as flattree} from "./src/flattree";
