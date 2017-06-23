@@ -13,6 +13,7 @@ function find_null_key(arr) {
 
 function find_null_item(arr, cols) {
   var idx = -1;
+  if(Object.keys(arr[0]).indexOf('values') > -1) {return idx;}
   arr.forEach(function(d,i) {
     if(
       cols.slice(0, cols.length - 1).reduce(
@@ -56,7 +57,6 @@ function recurse(list, hier_cols, level) {
     //   meaning no na/null for this node
     if(Object.keys(list).indexOf('key') > -1) {
       list.data.key = list.key;
-      data_found = true;
     }
     
     var idx;
@@ -90,6 +90,22 @@ function recurse(list, hier_cols, level) {
   }
 }
 
+function promote(parent) {
+  if(parent.depth === 0) {return}
+  if(!parent.children) {return}
+
+  var idx_null = parent.children.map(function(d,i){
+    if(!d.data.key || d.data.key === 'null') {return i}
+  }).filter(function(d){return d})[0];
+  
+  if(!idx_null) {return}
+  
+  parent.data.values = parent.children[idx_null].data.values;
+  parent.children.splice(idx_null,1);
+  if(parent.children.length === 0) {
+    delete parent.children;
+  }
+}
 
 export default function(dat, hier_cols) {
   // if only one hier column given then duplicate
@@ -129,10 +145,7 @@ export default function(dat, hier_cols) {
     
     // find children with key undefined and remove
     //  promote data to this level
-    if(d.depth >0 && d.children && !d.children[0].data.key) {
-      d.data.values = d.children[0].data.values;
-      delete d.children;
-    }
+    promote(d);
   });
 
   delete dh.data;
