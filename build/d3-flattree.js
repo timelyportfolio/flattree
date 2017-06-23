@@ -18,7 +18,7 @@ function find_null_item(arr, cols) {
   var idx = -1;
   arr.forEach(function(d,i) {
     if(
-      cols.reduce(
+      cols.slice(0, cols.length - 1).reduce(
         function(left, right) {
           left.push(d[right] || null);
           return left;
@@ -42,26 +42,54 @@ function get_leaf_data(arr) {
 }
 
 function is_leaf(list) {
-  return (Object.keys(list).indexOf('key') > -1 && Object.keys(list).indexOf('values') > -1)
+  return (
+    Object.keys(list).indexOf('key') > -1 &&
+      Object.keys(list).indexOf('values') > -1
+  );
 }
 
-function recurse(list, hier_cols) {
+function recurse(list, hier_cols, level) {
   if(is_leaf(list)) {
-    // key 'null' is indicator of data values
-    var idx = find_null_key(list.values);
-    // if we find 'null' key then promote data and remove 'null' item
-    if(idx > -1) {
-      list.data = get_leaf_data(list.values[idx]);
-      list.values.splice(idx,1);
-      list.values.map(function(x) {recurse(x,hier_cols);});
-    } else {
-      idx = find_null_item(list.values, hier_cols);
+    // use this to track if data found
+    var data_found = false;
+    
+    list.data = {};
+    
+    // if 'key' at node level then no data
+    //   meaning no na/null for this node
+    if(Object.keys(list).indexOf('key') > -1) {
+      list.data.key = list.key;
+      data_found = true;
+    }
+    
+    var idx;
+    
+    if(!data_found) {
+      // key 'null' is indicator of data values
+      idx = find_null_key(list.values);
+      // if we find 'null' key then promote data and remove 'null' item
       if(idx > -1) {
-        list.data = list.values[idx];
+        list.data.values = get_leaf_data(list.values[idx]);
+        list.data.key = list.key;
         list.values.splice(idx,1);
-        list.values.map(function(x) {recurse(x,hier_cols);});
+        data_found = true;
       }
     }
+    
+    if(!data_found) {
+      idx = find_null_item(list.values, hier_cols, level);
+      if(idx > -1) {
+        list.data.values = list.values[idx];
+        list.data.key = list.key;
+        list.values.splice(idx,1);
+        data_found = true;
+      }
+    }
+
+    
+    list.values.map( function(x) {
+      recurse(x, hier_cols, level+1);
+    });
   }
 }
 
@@ -81,12 +109,32 @@ var flattree = function(dat, hier_cols) {
     
   var dn = nester.entries(dat);
 
-  dn.map(function(x) {recurse(x,hier_cols);});
-  var dh = d3Hierarchy.hierarchy({key:'root', values:dn}, function(d) {return d.values});
+  dn.map(function(x) {recurse(x,hier_cols,1);});
+  var dh = d3Hierarchy.hierarchy(
+    {key:'root', values:dn},
+    function(d) {return d.values}
+  );
   
-  dh.each(function(d) {
+  dh.eachAfter(function(d) {
     if(d.data.data) {
       d.data = d.data.data;
+    } else {
+      // at child and for consistency
+      //  make data an object with key and values
+      if(d.depth > 0) {
+        var key = d.data[hier_cols.slice(d.depth - 1)];
+        d.data = {
+          key: key,
+          values: d.data
+        };
+      }
+    }
+    
+    // find children with key undefined and remove
+    //  promote data to this level
+    if(d.children && typeof(d.children[0].data.key) == 'undefined') {
+      d.data.values = d.children[0].data.values;
+      delete d.children;
     }
   });
 
