@@ -132,7 +132,7 @@ var flattree = function(dat, hier_cols) {
     
     // find children with key undefined and remove
     //  promote data to this level
-    if(d.children && typeof(d.children[0].data.key) == 'undefined') {
+    if(d.depth >0 && d.children && !d.children[0].data.key) {
       d.data.values = d.children[0].data.values;
       delete d.children;
     }
