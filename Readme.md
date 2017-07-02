@@ -51,6 +51,6 @@ d3.flattree(
 
 ### interactive datatable of flattree
 
-[bl.ocks](https://bl.ocks/timelyportfolio/e135afab3838dffd82226655245d3feb)
+[bl.ocks](https://bl.ocks.org/timelyportfolio/e135afab3838dffd82226655245d3feb)
 
-[bl.ocks](https://bl.ocks/timelyportfolio/34b4d053f20759ba19cc5f6655d2ce07)
+[bl.ocks](https://bl.ocks.org/timelyportfolio/34b4d053f20759ba19cc5f6655d2ce07)
